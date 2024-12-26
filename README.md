@@ -1,5 +1,5 @@
 # Ex.05 Design a Website for Server Side Processing
-# Date:
+# Date:19.10.2024
 # AIM:
 To design a website to calculate the power of a lamp filament in an incandescent bulb in the server side.
 
@@ -29,118 +29,122 @@ Create a HTML file to implement form based input and output.
 Publish the website in the given URL.
 
 # PROGRAM :
+calc.html
 ```
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lamp Power Calculator</title>
+    <title>Power Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background-color: #fff;
+            background-color: lightgrey;
+            margin: 20px;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            text-align: center;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 20px;
+            color: darkblue;
         }
 
-        .input-group {
-            margin-bottom: 10px;
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px grey;
+            display: inline-block;
+            margin: auto;
         }
 
         label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 5px;
+            font-weight: bold;
+            color: black;
         }
 
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+        input[type="number"] {
+            padding: 5px;
+            margin: 10px 0;
+            border: 1px solid black;
             border-radius: 4px;
         }
 
         button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
+            background-color: darkblue;
             color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 4px;
-            font-size: 16px;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #218838;
-        }
-
-        .result {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
+            background-color: navy;
         }
     </style>
 </head>
-<body style="background-color: rgb(212, 230, 173);">
-    <div class="container">
-        <h1>Lamp Power Calculator</h1>
-        <form id="lampPowerForm">
-            <div class="input-group">
-                <label for="intensity">Intensity (I in Amperes):</label>
-                <input type="number" id="intensity" placeholder="Enter Intensity" required>
-            </div>
-            <div class="input-group">
-                <label for="resistance">Resistance (R in Ohms):</label>
-                <input type="number" id="resistance" placeholder="Enter Resistance" required>
-            </div>
-            <button type="button" onclick="calculatePower()">Calculate Power</button>
-        </form>
-        <div class="result" id="result"></div>
-    </div>
-
-    <script>
-        function calculatePower() {
-            const intensity = parseFloat(document.getElementById('intensity').value);
-            const resistance = parseFloat(document.getElementById('resistance').value);
-            const resultElement = document.getElementById('result');
-
-            if (isNaN(intensity) || isNaN(resistance)) {
-                resultElement.textContent = "Please enter valid numbers for both Intensity and Resistance.";
-                return;
-            }
-
-            // Calculate Power (P = I^2 * R)
-            const power = Math.pow(intensity, 2) * resistance;
-            resultElement.textContent = `Calculated Power: ${power.toFixed(2)} Watts`;
-        }
-    </script>
+<body>
+    <h1>Power Calculator</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="I">Enter Current (I in Amps):</label>
+        <input type="number" name="intensity" id="I" value="{{ I }}" required>
+        <br><br>
+        <label for="R">Enter Resistance (R in Ohms):</label>
+        <input type="number" name="resistance" id="R" value="{{ R }}" required>
+        <br><br>
+        <button type="submit">Calculate Power</button>
+        <br><br>
+        <label for="power">Calculated Power (Watts):</label>
+        <input type="number" name="power" id="power" value="{{ power }}" readonly>
+    </form>
 </body>
 </html>
+```
+views.py
+```
+from django.shortcuts import render 
+def powercalc(request): 
+    context={} 
+    context['power'] = "0" 
+    context['I'] = "0" 
+    context['R'] = "0" 
+    if request.method == 'POST': 
+        print("POST method is used")
+        I = request.POST.get('intensity','0')
+        R = request.POST.get('resistance','0')
+        print('request=',request) 
+        print('intensity=',I) 
+        print('resistance=',R) 
+        power = (int(I) * int(I) ) * int(R) 
+        context['power'] = power
+        context['intensity'] = I
+        context['resistance'] = R 
+        print('power=',power) 
+    return render(request,'mathapp/math.html',context)
+
+```
+urls.py
+```
+from django.contrib import admin 
+from django.urls import path 
+from mathapp import views 
+urlpatterns = [ 
+    path('admin/', admin.site.urls), 
+    path('powercalculator/',views.powercalc,name="powercalculator"),
+    path('',views.powercalc,name="powercalculatorroot")
+]
 
 ```
 # SERVER SIDE PROCESSING:
+![Screenshot 2024-12-26 224408](https://github.com/user-attachments/assets/a0b297d6-1acc-4f66-9d36-99d62eface42)
+
+
+
 # HOMEPAGE:
-![image](https://github.com/user-attachments/assets/2aafa85e-100b-4686-b43d-a99ceb9ef05e)
+![mathser](https://github.com/user-attachments/assets/af76b19a-2bea-443a-abc2-13269d719775)
+
+
+
 
 # RESULT:
 The program for performing server side processing is completed successfully.
